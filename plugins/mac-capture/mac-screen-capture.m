@@ -637,10 +637,8 @@ static inline void build_sprite_rect(struct gs_vb_data *data, float origin_x,
 		     origin_x, end_x, origin_y, end_y);
 }
 
-static void screen_capture_video_tick(void *data, float seconds)
+static void screen_capture_video_tick(void *data, float seconds OBS_UNUSED)
 {
-	UNUSED_PARAMETER(seconds);
-
 	struct screen_capture *sc = data;
 
 	if (!sc->current)
@@ -677,9 +675,9 @@ static void screen_capture_video_tick(void *data, float seconds)
 	}
 }
 
-static void screen_capture_video_render(void *data, gs_effect_t *effect)
+static void screen_capture_video_render(void *data,
+					gs_effect_t *effect OBS_UNUSED)
 {
-	UNUSED_PARAMETER(effect);
 	struct screen_capture *sc = data;
 
 	if (!sc->tex)
@@ -711,9 +709,8 @@ static void screen_capture_video_render(void *data, gs_effect_t *effect)
 	gs_enable_framebuffer_srgb(previous);
 }
 
-static const char *screen_capture_getname(void *unused)
+static const char *screen_capture_getname(void *unused OBS_UNUSED)
 {
-	UNUSED_PARAMETER(unused);
 	return "macOS ScreenCapture";
 }
 
@@ -741,7 +738,7 @@ static void screen_capture_defaults(obs_data_t *settings)
 				mainScreen.deviceDescription[@"NSScreenNumber"];
 			if (screen_num) {
 				initial_display =
-					(CGDirectDisplayID)
+					(CGDirectDisplayID)(uintptr_t)
 						screen_num.pointerValue;
 			}
 		}
@@ -844,7 +841,7 @@ static bool build_display_list(struct screen_capture *sc,
 						screen.deviceDescription
 							[@"NSScreenNumber"];
 					CGDirectDisplayID screen_display_id =
-						(CGDirectDisplayID)
+						(CGDirectDisplayID)(uintptr_t)
 							screen_num.pointerValue;
 					stop = (BOOL)(screen_display_id ==
 						      display.displayID);
@@ -895,10 +892,8 @@ static bool build_window_list(struct screen_capture *sc,
 
 	[sc->shareable_content.windows enumerateObjectsUsingBlock:^(
 					       SCWindow *_Nonnull window,
-					       NSUInteger idx,
-					       BOOL *_Nonnull stop) {
-		UNUSED_PARAMETER(idx);
-		UNUSED_PARAMETER(stop);
+					       NSUInteger idx OBS_UNUSED,
+					       BOOL *_Nonnull stop OBS_UNUSED) {
 		NSString *app_name = window.owningApplication.applicationName;
 		NSString *title = window.title;
 
@@ -940,9 +935,8 @@ static bool build_application_list(struct screen_capture *sc,
 	[sc->shareable_content.applications
 		enumerateObjectsUsingBlock:^(
 			SCRunningApplication *_Nonnull application,
-			NSUInteger idx, BOOL *_Nonnull stop) {
-			UNUSED_PARAMETER(idx);
-			UNUSED_PARAMETER(stop);
+			NSUInteger idx OBS_UNUSED,
+			BOOL *_Nonnull stop OBS_UNUSED) {
 			const char *name =
 				[application.applicationName UTF8String];
 			const char *bundle_id =
@@ -976,11 +970,9 @@ static bool content_changed(struct screen_capture *sc, obs_properties_t *props,
 }
 
 static bool content_settings_changed(void *priv, obs_properties_t *props,
-				     obs_property_t *property,
+				     obs_property_t *property OBS_UNUSED,
 				     obs_data_t *settings)
 {
-	UNUSED_PARAMETER(property);
-
 	struct screen_capture *sc = (struct screen_capture *)priv;
 
 	sc->show_empty_names = obs_data_get_bool(settings, "show_empty_names");
